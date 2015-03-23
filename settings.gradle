@@ -1,0 +1,3 @@
+include 'excelextractor'
+include 'common', 'service/common', 'service/info', 'service/image', 'service/sound', 'service/test', 'service/mainpage', 'service/binaryok'
+

@@ -1,0 +1,17 @@
+server:
+  port: 9991
+
+spring:
+  application:
+    name: bird-sound-service
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: https://user:ieX6ooF1@guarded-plateau-9108.herokuapp.com/eureka/
+    registryFetchIntervalSeconds: 10
+    instanceInfoReplicationIntervalSeconds: 10
+  instance:
+    appname: SOUND
+    metadataMap:
+      instanceId: SOUND:${spring.application.instance_id:${random.value}}
