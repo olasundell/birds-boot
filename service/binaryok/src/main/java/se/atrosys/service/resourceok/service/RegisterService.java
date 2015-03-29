@@ -1,12 +1,12 @@
 package se.atrosys.service.resourceok.service;
 
 import org.springframework.stereotype.Component;
-import se.atrosys.service.resourceok.resource.OkResource;
+import se.atrosys.birds.common.model.AbstractBinary;
 import se.atrosys.service.resourceok.response.OkPostResponse;
 
 @Component
 public class RegisterService {
-	public OkPostResponse register(OkResource resource) {
+	public OkPostResponse register(AbstractBinary resource) {
 		return null;
 	}
 

@@ -72,6 +72,11 @@ public class Sound extends AbstractBinary {
 	}
 
 	@Override
+	public String getBirdId() {
+		return birdName;
+	}
+
+	@Override
 	public String getId() {
 		return xenoCantoId;
 	}

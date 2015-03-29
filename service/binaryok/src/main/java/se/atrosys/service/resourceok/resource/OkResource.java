@@ -2,6 +2,7 @@ package se.atrosys.service.resourceok.resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import se.atrosys.birds.common.model.AbstractBinary;
 import se.atrosys.service.resourceok.response.OkPostResponse;
 import se.atrosys.service.resourceok.service.RegisterService;
 
@@ -31,7 +32,7 @@ public class OkResource {
 
 	@RequestMapping(value = "/register/", method = RequestMethod.POST)
 	@ResponseBody
-	public OkPostResponse isOk(@RequestBody OkResource resource) {
+	public OkPostResponse isOk(@RequestBody AbstractBinary resource) {
 		return registerService.register(resource);
 	}
 }

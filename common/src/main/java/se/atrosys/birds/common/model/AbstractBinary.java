@@ -4,5 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class AbstractBinary implements Model {
 	@JsonIgnore
+	public abstract String getBirdId();
+	@JsonIgnore
 	public abstract String getId();
 }
