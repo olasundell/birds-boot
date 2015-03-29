@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class FlickrService {
@@ -23,28 +24,11 @@ public class FlickrService {
 
 	public FlickrService() {
 		restTemplate = new RestTemplate();
-
-//		final HttpComponentsAsyncClientHttpRequestFactory requestFactory = new HttpComponentsAsyncClientHttpRequestFactory();
-//		final BaseProtectedResourceDetails protectedResourceDetails = new BaseProtectedResourceDetails();
-//		final CoreOAuthConsumerSupport coreOAuthConsumerSupport = new CoreOAuthConsumerSupport();
-//
-//		final OAuthClientHttpRequestFactory oAuthClientHttpRequestFactory = new OAuthClientHttpRequestFactory(requestFactory,
-//				protectedResourceDetails,
-//				coreOAuthConsumerSupport);
-//
-//		oAuthRestTemplate = new OAuthRestTemplate(oAuthClientHttpRequestFactory, protectedResourceDetails);
 	}
 
-	public Image getImage(String id) {
-//		oAuthRestTemplate.getForEntity()
-
+	public List<Image> getImages(String id) {
 		final String url = String.format("https://api.flickr.com/services/rest/");
 		final UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(url);
-
-
-		//?method=flickr.photos.search&text=%s&api_key=%s&format=json&nojsoncallback=1",
-//				"Troglodytes troglodytes",
-//				APIKEY);
 
 		final MultiValueMap<String, String> urlVariables = new LinkedMultiValueMap<>();
 
@@ -59,7 +43,16 @@ public class FlickrService {
 
 		DTO dto = restTemplate.getForObject(uriComponentsBuilder.build(false).toUriString(), FlickrService.DTO.class);
 
-		return new Image(dto.photos.photo.get(0).id, constructUrl(dto.photos.photo.get(0)), id);
+		if (dto != null && dto.photos != null && dto.photos.photo != null) {
+			return dto.photos.photo.stream()
+					.map(photo -> createImage(id, photo))
+					.collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+
+	private Image createImage(String id, DTO.Photos.Photo photo) {
+		return new Image(photo.id, constructUrl(photo), id);
 	}
 
 	protected String constructUrl(DTO.Photos.Photo photo) {
@@ -99,20 +92,6 @@ public class FlickrService {
 				public boolean isfamily;
 				public int farm;
 			}
-//					"photo" : [
-//			{
-//				"owner" : "63223331@N05",
-//					"server" : "7595",
-//					"id" : "16772157399",
-//					"title" : "Wren (Troglodytes troglodytes)",
-//					"secret" : "bd6567a7c5",
-//					"ispublic" : 1,
-//					"isfriend" : 0,
-//					"farm" : 8,
-//					"isfamily" : 0
-//			}
-//			],
-//					"perpage" : 1
 		}
 	}
 }
