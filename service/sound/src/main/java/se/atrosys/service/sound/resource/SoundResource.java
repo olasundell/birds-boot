@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.atrosys.birds.common.formatter.BirdNameFormatter;
 import se.atrosys.service.sound.factory.SoundResponseFactory;
-import se.atrosys.service.sound.response.SoundResponse;
+import se.atrosys.service.common.response.SoundResponse;
 
 @RestController
 public class SoundResource {

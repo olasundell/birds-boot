@@ -11,7 +11,7 @@ import se.atrosys.birds.common.model.Sound;
 import se.atrosys.service.common.Cache;
 import se.atrosys.service.common.service.ProviderLookupService;
 import se.atrosys.service.sound.dto.XenoCantoDTO;
-import se.atrosys.service.sound.response.SoundResponse;
+import se.atrosys.service.common.response.SoundResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;

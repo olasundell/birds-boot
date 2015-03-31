@@ -3,7 +3,7 @@ package se.atrosys.service.info.factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.atrosys.service.common.service.ProviderLookupService;
-import se.atrosys.service.info.response.FamilyResponse;
+import se.atrosys.service.common.response.FamilyResponse;
 
 import java.util.List;
 

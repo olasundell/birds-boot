@@ -5,9 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.atrosys.birds.common.formatter.BirdNameFormatter;
-import se.atrosys.birds.common.model.Family;
 import se.atrosys.service.info.factory.FamilyFactory;
-import se.atrosys.service.info.response.FamilyResponse;
+import se.atrosys.service.common.response.FamilyResponse;
 
 @RestController
 public class FamilyResource {

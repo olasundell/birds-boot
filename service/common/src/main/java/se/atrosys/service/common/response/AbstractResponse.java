@@ -7,8 +7,8 @@ import se.atrosys.service.common.service.ServiceProvider;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractResponse {
-	protected final List<Model> models = new ArrayList<>();
+public abstract class AbstractResponse<T extends Model> {
+	protected final List<T> models = new ArrayList<>();
 	protected final ProviderLookupService providerLookupService;
 
 	public AbstractResponse(ProviderLookupService lookupService) {
@@ -43,7 +43,7 @@ public abstract class AbstractResponse {
 				.build();
 	}
 
-	public void addModels(Collection<? extends Model> models) {
+	public void addModels(Collection<T> models) {
 		this.models.addAll(models);
 	}
 }

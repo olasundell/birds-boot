@@ -1,4 +1,4 @@
-package se.atrosys.service.info.response;
+package se.atrosys.service.common.response;
 
 import se.atrosys.birds.common.model.Bird;
 import se.atrosys.birds.common.model.Model;
@@ -7,12 +7,12 @@ import se.atrosys.service.common.service.ProviderLookupService;
 
 import java.util.*;
 
-public class BirdResponse extends AbstractResponse {
+public class BirdResponse extends AbstractResponse<Bird> {
 	public BirdResponse(ProviderLookupService lookupService) {
 		super(lookupService);
 	}
 
-	public List<Model> getBirds() {
+	public List<Bird> getBirds() {
 		return Collections.unmodifiableList(models);
 	}
 

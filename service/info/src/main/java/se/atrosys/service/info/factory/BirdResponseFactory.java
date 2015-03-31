@@ -1,16 +1,12 @@
 package se.atrosys.service.info.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import se.atrosys.birds.common.model.Aves;
 import se.atrosys.birds.common.model.Bird;
 import se.atrosys.service.common.factory.AbstractResponseFactory;
-import se.atrosys.service.common.service.ProviderLookupService;
-import se.atrosys.service.info.response.BirdResponse;
+import se.atrosys.service.common.response.BirdResponse;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -24,13 +20,13 @@ public class BirdResponseFactory extends AbstractResponseFactory {
 	}
 
 //	public BirdResponse createResponseForRandomBird(int randseed) {
-	public Bird createResponseForRandomBird(int randseed) {
+	public BirdResponse createResponseForRandomBird(int randseed) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 
 //		random.setSeed(randseed);
 		Bird bird = aves.getBirds().get(random.nextInt(aves.getBirds().size()));
 
-//		return createResponse(Collections.singletonList(bird.getName()));
-		return bird;
+		return createResponse(Collections.singletonList(bird.getName()));
+//		return bird;
 	}
 }
