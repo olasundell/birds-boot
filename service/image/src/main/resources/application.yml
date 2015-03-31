@@ -1,9 +1,9 @@
 spring:
   application:
-    name: binaryok
+    name: image
 
 server:
-  port: 9995
+  port: 9993
 
 eureka:
   client:
@@ -13,6 +13,6 @@ eureka:
     registryFetchIntervalSeconds: 10
     instanceInfoReplicationIntervalSeconds: 10
 #  instance:
-#    appname: BINARYOK
+#    appname: IMAGE
 #    metadataMap:
-#      instanceId: BINARYOK:${spring.application.instance_id:${random.value}}
+#      instanceId: IMAGE:${spring.application.instance_id:${random.value}}

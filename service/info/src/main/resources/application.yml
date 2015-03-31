@@ -1,2 +1,19 @@
+spring:
+  application:
+    name: info
+
 server:
   port: 9990
+
+eureka:
+  client:
+    serviceUrl:
+#      defaultZone: https://user:ieX6ooF1@guarded-plateau-9108.herokuapp.com/eureka/
+      defaultZone: http://localhost:8761/eureka/
+    registryFetchIntervalSeconds: 10
+    instanceInfoReplicationIntervalSeconds: 10
+#  instance:
+#    hostname: ${APPLICATION_DOMAIN}
+#    appname: INFO
+#    metadataMap:
+#      instanceId: INFO:${spring.application.instance_id:${random.value}}

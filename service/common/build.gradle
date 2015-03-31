@@ -5,7 +5,8 @@ dependencies {
 	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka', version: '1.0.0.RELEASE'
 	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka-server', version: '1.0.0.RELEASE'
 
-	compile project(":common")
+	// Do NOT include :common, since it will break bootRepackage. :common is provided via :excelextractor
+//	compile project(":common")
 	compile project(":excelextractor")
 
 }

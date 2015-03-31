@@ -1,4 +1,5 @@
 /*buildscript {
+
 	repositories {
 		maven { url "https://github.com/layerhq/releases-gradle/raw/master/releases" }
 	}
@@ -6,6 +7,15 @@
 		classpath group: 'com.layer', name: 'git-repo-plugin', version: '1.0.0'
 	}
 }*/
+buildscript {
+	repositories {
+		maven { url "http://repo.spring.io/libs-snapshot" }
+		mavenCentral()
+	}
+	dependencies {
+		classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: '1.2.2.RELEASE'
+	}
+}
 
 allprojects {
 //	apply plugin: 'git-repo'
@@ -34,6 +44,21 @@ allprojects {
 		from sourceSets.main.allJava
 	}
 
+	jar {
+		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	}
+
+//	zip {
+//		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//	}
+
+//	task buildDist(type: Zip) {
+//		into 'jars'
+//		from { subprojects.configurations.runtime }
+//		from { subprojects.jar }
+//		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//	}
+
 	publishing {
 		publications {
 			maven(MavenPublication) {
@@ -45,6 +70,34 @@ allprojects {
 			}
 		}
 	}
+}
+
+configure(subprojects.findAll { it.getPath() =~ /service/ }) {
+	apply plugin: 'spring-boot'
+
+	distTar {
+		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	}
+
+//	bootRepackage {
+//		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//	}
+//
+	distZip {
+		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	}
+//
+//	dependencies {
+//		compile("org.springframework.boot:spring-boot-starter-web:1.2.2.RELEASE")
+//		compile group: 'org.springframework', name: 'spring-context-support', version: '4.1.5.RELEASE'
+//		compile group: 'net.sf.ehcache', name: 'ehcache', version: '2.9.0'
+//		compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka', version: '1.0.0.RELEASE'
+//		compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka-server', version: '1.0.0.RELEASE'
+//
+//		compile project(":common")
+//		compile project(":excelextractor")
+//
+//	}
 }
 //
 //task wrapper(type: Wrapper) {

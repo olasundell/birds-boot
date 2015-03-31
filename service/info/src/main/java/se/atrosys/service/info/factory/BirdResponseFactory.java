@@ -23,12 +23,14 @@ public class BirdResponseFactory extends AbstractResponseFactory {
 		return birdResponse;
 	}
 
-	public BirdResponse createResponseForRandomBird(int randseed) {
+//	public BirdResponse createResponseForRandomBird(int randseed) {
+	public Bird createResponseForRandomBird(int randseed) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 
-		random.setSeed(randseed);
+//		random.setSeed(randseed);
 		Bird bird = aves.getBirds().get(random.nextInt(aves.getBirds().size()));
 
-		return createResponse(Collections.singletonList(bird.getName()));
+//		return createResponse(Collections.singletonList(bird.getName()));
+		return bird;
 	}
 }

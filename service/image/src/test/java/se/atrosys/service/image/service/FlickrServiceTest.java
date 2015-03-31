@@ -5,6 +5,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import se.atrosys.birds.common.model.Image;
 
+import java.util.List;
+
 public class FlickrServiceTest {
 
 	public static final String ID = "Troglodytes troglodytes";
@@ -12,7 +14,9 @@ public class FlickrServiceTest {
 	@Test
 	@Ignore
 	public void shouldGetDTO() {
-		Image image = new FlickrService().getImage(ID);
+		List<Image> images = new FlickrService().getImages(ID);
+
+		Image image = images.get(0);
 
 		Assert.assertNotNull(image);
 		Assert.assertEquals(ID, image.getBirdId());

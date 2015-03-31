@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.atrosys.birds.common.formatter.BirdNameFormatter;
+import se.atrosys.birds.common.model.Bird;
 import se.atrosys.service.info.factory.BirdResponseFactory;
 import se.atrosys.service.info.response.BirdResponse;
 
@@ -20,7 +21,7 @@ public class BirdResource {
 	}
 
 	@RequestMapping("/randombird/")
-	public BirdResponse randombird(@RequestParam(value = "randseed", required = false, defaultValue = "0") int randseed) {
+	public Bird randombird(@RequestParam(value = "randseed", required = false, defaultValue = "0") int randseed) {
 		return birdResponseFactory.createResponseForRandomBird(randseed);
 	}
 
