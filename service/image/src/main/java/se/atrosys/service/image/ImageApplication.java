@@ -1,4 +1,4 @@
-package se.atrosys.service.sound;
+package se.atrosys.service.image;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableAutoConfiguration
 @ComponentScan("se.atrosys")
 @EnableEurekaClient
-public class BirdSoundApplication {
+public class ImageApplication {
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(BirdSoundApplication.class, args);
+		SpringApplication.run(ImageApplication.class, args);
 	}
 }
