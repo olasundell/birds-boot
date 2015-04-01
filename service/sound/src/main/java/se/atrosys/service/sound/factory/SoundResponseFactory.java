@@ -9,7 +9,6 @@ import org.springframework.web.client.RestTemplate;
 import se.atrosys.birds.common.model.Model;
 import se.atrosys.birds.common.model.Sound;
 import se.atrosys.service.common.Cache;
-import se.atrosys.service.common.service.ProviderLookupService;
 import se.atrosys.service.sound.dto.XenoCantoDTO;
 import se.atrosys.service.common.response.SoundResponse;
 
@@ -21,8 +20,6 @@ import java.util.stream.Collectors;
 @Component
 public class SoundResponseFactory {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
-	ProviderLookupService providerLookupService;
 	private static final String UNLESS_SPEL = "#result == null";
 
 //	@Cacheable(value = CacheConstants.SOUND_CACHE, unless = UNLESS_SPEL)
@@ -30,7 +27,7 @@ public class SoundResponseFactory {
 	public SoundResponse createResponse(List<String> ids, int limit) {
 		logger.info("Creating response for {}", ids);
 		RestTemplate template = new RestTemplate();
-		SoundResponse soundResponse = new SoundResponse(providerLookupService);
+		SoundResponse soundResponse = new SoundResponse();
 
 		for (String id: ids) {
 			XenoCantoDTO dto = template.getForObject("http://www.xeno-canto.org/api/2/recordings?query={birdName}",
@@ -43,7 +40,7 @@ public class SoundResponseFactory {
 		return soundResponse;
 	}
 
-	private Collection<? extends Model> createModels(XenoCantoDTO dto, int limit) {
+	private Collection<Sound> createModels(XenoCantoDTO dto, int limit) {
 		if (dto == null || dto.recordings == null) {
 			return new ArrayList<>();
 		}

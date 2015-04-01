@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.atrosys.birds.common.model.Image;
+import se.atrosys.service.common.response.ImageResponse;
 import se.atrosys.service.image.service.FlickrService;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class ImageResource {
 	FlickrService flickrService;
 
 	@RequestMapping("/image/{id}")
-	public List<Image> image(@PathVariable("id") String id) {
-		return flickrService.getImages(id);
+	public ImageResponse image(@PathVariable("id") String id) {
+		return ImageResponse.builder().withImages(flickrService.getImages(id)).build();
 	}
 }

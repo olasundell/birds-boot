@@ -1,7 +1,6 @@
 package se.atrosys.service.common.response;
 
 import se.atrosys.birds.common.model.Model;
-import se.atrosys.service.common.service.ProviderLookupService;
 import se.atrosys.service.common.service.ServiceProvider;
 
 import java.util.*;
@@ -9,11 +8,6 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractResponse<T extends Model> {
 	protected final List<T> models = new ArrayList<>();
-	protected final ProviderLookupService providerLookupService;
-
-	public AbstractResponse(ProviderLookupService lookupService) {
-		this.providerLookupService = lookupService;
-	}
 
 	public Map<String, Link> getLinks() {
 		Set<Class> classes = models.stream().map(Model::getClass).collect(Collectors.toSet());
@@ -38,7 +32,7 @@ public abstract class AbstractResponse<T extends Model> {
 	private Link generateLinkFromClass(Class c) {
 		ServiceProvider p = ServiceProvider.getProvider(c);
 		return Link.builder()
-				.withHref(providerLookupService.getHref(p))
+				.withHref(p.name().toLowerCase())
 				.withType(p.name().toLowerCase())
 				.build();
 	}

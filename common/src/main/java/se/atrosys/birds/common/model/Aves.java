@@ -24,12 +24,16 @@ public class Aves implements Model {
 		return Collections.unmodifiableCollection(orders.values());
 	}
 
-	public Collection<Family> getFamilies() {
-		return Collections.unmodifiableCollection(families.values());
+	public List<Family> getFamilies() {
+		return Collections.unmodifiableList(new ArrayList<>(families.values()));
 	}
 
 	public List<Bird> getBirds() {
 		return birds.values().stream().collect(Collectors.toList());
+	}
+
+	public Family getFamily(String name) {
+		return families.get(name);
 	}
 
 	public Bird getBird(String latinName) {

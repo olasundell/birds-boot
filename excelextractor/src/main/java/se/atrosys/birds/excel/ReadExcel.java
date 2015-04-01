@@ -1,12 +1,7 @@
 package se.atrosys.birds.excel;
 
-import org.apache.poi.POIOLE2TextExtractor;
-import org.apache.poi.POITextExtractor;
-import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.xmlbeans.XmlException;
 import se.atrosys.birds.common.formatter.BirdNameFormatter;
 import se.atrosys.birds.common.model.Aves;
@@ -14,7 +9,6 @@ import se.atrosys.birds.common.model.Bird;
 import se.atrosys.birds.common.model.Family;
 import se.atrosys.birds.common.model.Order;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -47,7 +41,7 @@ public class ReadExcel {
 				builder.withOrder(order);
 
 				Family family = getOrCreateFamily(order, families, row.getCell(1), row.getCell(2));
-				builder.withFamily(family);
+				builder.withFamilyInstance(family);
 
 				builder.withName(Locale.ENGLISH, formatter.formatName(row.getCell(3).getStringCellValue()));
 				builder.withName(Bird.LATIN, formatter.formatName(row.getCell(4).getStringCellValue()));
@@ -73,10 +67,13 @@ public class ReadExcel {
 		if (families.containsKey(name)) {
 			return families.get(name);
 		} else {
-			Family family = new Family();
-			family.addName(Bird.LATIN, name);
-			family.addName(Locale.ENGLISH, cell1.getStringCellValue());
-			family.setOrder(order);
+			Family.Builder builder = Family.builder();
+			builder.withName(name);
+//			builder.withName(Bird.LATIN, name);
+//			builder.withName(Locale.ENGLISH, cell1.getStringCellValue());
+			builder.withOrder(order);
+
+			final Family family = builder.build();
 
 			order.addFamily(family);
 

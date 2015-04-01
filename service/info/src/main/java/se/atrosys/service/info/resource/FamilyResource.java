@@ -5,21 +5,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.atrosys.birds.common.formatter.BirdNameFormatter;
-import se.atrosys.service.info.factory.FamilyFactory;
+import se.atrosys.service.info.factory.FamilyResponseFactory;
 import se.atrosys.service.common.response.FamilyResponse;
 
 @RestController
 public class FamilyResource {
 	@Autowired
-	FamilyFactory familyFactory;
+	FamilyResponseFactory familyResponseFactory;
 
 	@RequestMapping("/family/{names}")
 	public FamilyResponse family(@PathVariable("names") String names) {
-		return familyFactory.createResponse(new BirdNameFormatter().formatNames(names));
+		return familyResponseFactory.createResponse(new BirdNameFormatter().formatNames(names));
 	}
 
 	@RequestMapping("/families")
 	public FamilyResponse families() {
-		return familyFactory.createFamilyResponse(10);
+		return familyResponseFactory.createFamilyResponse(10);
 	}
 }

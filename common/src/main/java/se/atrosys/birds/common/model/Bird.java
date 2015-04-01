@@ -1,7 +1,10 @@
 package se.atrosys.birds.common.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.*;
 
+@JsonDeserialize(builder=Bird.Builder.class)
 public class Bird implements Model {
 	public final static Locale LATIN = new Locale("lat");
 	private final Map<Locale, String> names = new HashMap<>();
@@ -47,6 +50,13 @@ public class Bird implements Model {
 			return this;
 		}
 
+		public Builder withNames(Map<Locale, String> names) {
+			this.names.clear();
+			this.names.putAll(names);
+
+			return this;
+		}
+
 		public Bird build() {
 			return new Bird(this);
 		}
@@ -56,7 +66,12 @@ public class Bird implements Model {
 			return this;
 		}
 
-		public Builder withFamily(Family family) {
+		public Builder withFamily(String familyName) {
+			this.family = Family.builder().withName(familyName).build();
+			return this;
+		}
+
+		public Builder withFamilyInstance(Family family) {
 			this.family = family;
 			return this;
 		}

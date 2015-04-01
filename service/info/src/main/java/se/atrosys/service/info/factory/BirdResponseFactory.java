@@ -14,12 +14,9 @@ import java.util.stream.Collectors;
 public class BirdResponseFactory extends AbstractResponseFactory {
 	public BirdResponse createResponse(List<String> ids) {
 		List<Bird> birds = ids.stream().map(aves::getBird).filter(b -> b != null).collect(Collectors.toList());
-		BirdResponse birdResponse = new BirdResponse(providerLookupService);
-		birdResponse.addModels(birds);
-		return birdResponse;
+		return BirdResponse.builder().withBirds(birds).build();
 	}
 
-//	public BirdResponse createResponseForRandomBird(int randseed) {
 	public BirdResponse createResponseForRandomBird(int randseed) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 

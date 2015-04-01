@@ -16,6 +16,7 @@ public class ReadExcelTest {
 		Assert.assertNotNull(aves);
 		Assert.assertNotEquals(0, aves.getOrders().size());
 		Assert.assertNotEquals(0, aves.getFamilies().size());
+		Assert.assertNotEquals(0, aves.getFamilies().get(0).getBirdNames().size());
 		Assert.assertNotEquals(0, aves.getBirds().size());
 	}
 }

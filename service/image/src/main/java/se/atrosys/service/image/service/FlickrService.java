@@ -51,8 +51,12 @@ public class FlickrService {
 		return Collections.emptyList();
 	}
 
-	private Image createImage(String id, DTO.Photos.Photo photo) {
-		return new Image(photo.id, constructUrl(photo), id);
+	private Image createImage(String birdId, DTO.Photos.Photo photo) {
+		return Image.builder()
+				.withId(photo.id)
+				.withUrl(constructUrl(photo))
+				.withBirdId(birdId)
+				.build();
 	}
 
 	protected String constructUrl(DTO.Photos.Photo photo) {
@@ -66,7 +70,8 @@ public class FlickrService {
 		map.put("id", photo.id);
 		map.put("secret", photo.secret);
 
-		return builder.buildAndExpand(map).toString();
+		final String s = builder.buildAndExpand(map).toString();
+		return s;
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)

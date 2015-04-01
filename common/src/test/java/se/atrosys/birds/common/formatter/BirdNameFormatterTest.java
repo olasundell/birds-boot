@@ -26,6 +26,14 @@ public class BirdNameFormatterTest {
 	}
 
 	@Test
+	public void shouldSplitCommas() {
+		List<String> result = formatter.formatNames("Sterna repressa,Larus larus");
+
+		Assert.assertNotNull(result);
+		Assert.assertEquals(2, result.size());
+	}
+
+	@Test
 	public void shouldReturnUpperCaseForSingleChar() {
 		Assert.assertEquals("P", formatter.formatName("p"));
 	}
