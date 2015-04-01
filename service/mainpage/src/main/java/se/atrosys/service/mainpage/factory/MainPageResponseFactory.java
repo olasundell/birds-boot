@@ -11,8 +11,10 @@ import se.atrosys.birds.common.model.Image;
 import se.atrosys.service.common.response.BirdResponse;
 import se.atrosys.service.common.response.FamilyResponse;
 import se.atrosys.service.common.response.ImageResponse;
+import se.atrosys.service.mainpage.model.MainPage;
 import se.atrosys.service.mainpage.response.MainPageResponse;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Component
@@ -61,16 +63,21 @@ public class MainPageResponseFactory {
 
 		final String birdIds = familyResponse.getFamilies().stream()
 				.flatMap(f -> f.getBirdNames().stream())
+				.limit(5)
 				.collect(Collectors.joining(","));
 
 		logger.info("Getting info for alternatives {}", birdIds);
 
 		BirdResponse alternativeBirds = restTemplate.getForObject("http://info/bird/{names}", BirdResponse.class, birdIds);
 
-		return new MainPageResponse.Builder()
-				.bird(bird)
-				.alternatives(alternativeBirds.getBirds())
-				.binary(image)
+		final MainPage mainPage = MainPage.builder()
+				.withBird(bird)
+				.withAlternatives(alternativeBirds.getBirds())
+				.withBinary(image)
+				.build();
+
+		return MainPageResponse.builder()
+				.withMainPages(Collections.singletonList(mainPage))
 				.build();
 	}
 }

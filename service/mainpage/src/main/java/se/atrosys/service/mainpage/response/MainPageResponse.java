@@ -1,64 +1,45 @@
 package se.atrosys.service.mainpage.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
 import se.atrosys.birds.common.model.AbstractBinary;
 import se.atrosys.birds.common.model.Bird;
+import se.atrosys.service.common.response.AbstractResponse;
+import se.atrosys.service.mainpage.model.MainPage;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class MainPageResponse {
-	@NotNull
-	private final Bird bird;
-
-	@NotNull
-	private final List<Bird> alternatives;
-
-	@NotNull
-	private final AbstractBinary binary;
-
+@JsonDeserialize(builder = MainPageResponse.Builder.class)
+public class MainPageResponse extends AbstractResponse<MainPage> {
 	private MainPageResponse(Builder builder) {
-		this.bird = Preconditions.checkNotNull(builder.bird);
-		this.alternatives = Preconditions.checkNotNull(builder.alternatives);
-		this.binary = Preconditions.checkNotNull(builder.binary);
+		this.models.addAll(builder.mainPages);
 	}
 
-	public Bird getBird() {
-		return bird;
+	public List<MainPage> getMainPage() {
+		return Collections.unmodifiableList(models);
 	}
 
-	public List<Bird> getAlternatives() {
-		return alternatives;
+	@Override
+	protected String getLinkPrefix() {
+		return "mainpage";
 	}
 
-	public AbstractBinary getBinary() {
-		return binary;
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	public static class Builder {
-		private Bird bird;
-		private List<Bird> alternatives;
-		private AbstractBinary binary;
+		private final List<MainPage> mainPages = new ArrayList<>();
 
-		public Builder bird(Bird bird) {
-			this.bird = bird;
-			return this;
-		}
+		private Builder() {}
 
-		public Builder alternatives(List<Bird> alternatives) {
-			this.alternatives = alternatives;
-			return this;
-		}
+		public Builder withMainPages(List<MainPage> mainPages) {
+			this.mainPages.clear();
+			this.mainPages.addAll(mainPages);
 
-		public Builder binary(AbstractBinary binary) {
-			this.binary = binary;
-			return this;
-		}
-
-		public Builder fromPrototype(MainPageResponse prototype) {
-			bird = prototype.bird;
-			alternatives = prototype.alternatives;
-			binary = prototype.binary;
 			return this;
 		}
 
