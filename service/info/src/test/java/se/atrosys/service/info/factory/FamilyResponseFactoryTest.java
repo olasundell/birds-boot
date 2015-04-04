@@ -19,10 +19,10 @@ public class FamilyResponseFactoryTest {
 		Aves aves = new ReadExcel().read();
 		final FamilyResponseFactory familyResponseFactory = new FamilyResponseFactory();
 		familyResponseFactory.setAves(aves);
-		FamilyResponse response = familyResponseFactory.createResponse(Collections.singletonList("Laridae"));
-
-		Assert.assertEquals(1, response.getFamilies().size());
-		Assert.assertNotEquals(0, response.getFamilies().get(0).getBirdNames());
+		familyResponseFactory.createResponse(Collections.singletonList("Laridae")).doOnNext(response ->  {
+			Assert.assertEquals(1, response.getFamilies().size());
+			Assert.assertNotEquals(0, response.getFamilies().get(0).getBirdNames());
+		});
 	}
 
 }

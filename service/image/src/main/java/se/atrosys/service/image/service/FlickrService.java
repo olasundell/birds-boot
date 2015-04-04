@@ -6,6 +6,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import rx.Observable;
 import se.atrosys.birds.common.model.Image;
 
 import java.util.Collections;
@@ -26,7 +27,7 @@ public class FlickrService {
 		restTemplate = new RestTemplate();
 	}
 
-	public List<Image> getImages(String id) {
+	public Observable<List<Image>> getImages(String id) {
 		final String url = String.format("https://api.flickr.com/services/rest/");
 		final UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(url);
 
@@ -44,11 +45,11 @@ public class FlickrService {
 		DTO dto = restTemplate.getForObject(uriComponentsBuilder.build(false).toUriString(), FlickrService.DTO.class);
 
 		if (dto != null && dto.photos != null && dto.photos.photo != null) {
-			return dto.photos.photo.stream()
+			return Observable.just(dto.photos.photo.stream()
 					.map(photo -> createImage(id, photo))
-					.collect(Collectors.toList());
+					.collect(Collectors.toList()));
 		}
-		return Collections.emptyList();
+		return Observable.empty();
 	}
 
 	private Image createImage(String birdId, DTO.Photos.Photo photo) {

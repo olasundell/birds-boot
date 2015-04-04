@@ -3,11 +3,13 @@ package se.atrosys.service.mainpage.factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.AsyncRestTemplate;
+import rx.Observable;
 import se.atrosys.birds.common.model.Bird;
-import se.atrosys.birds.common.model.Family;
-import se.atrosys.birds.common.model.Image;
 import se.atrosys.service.common.response.BirdResponse;
 import se.atrosys.service.common.response.FamilyResponse;
 import se.atrosys.service.common.response.ImageResponse;
@@ -22,62 +24,69 @@ public class MainPageResponseFactory {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private AsyncRestTemplate asyncRibbonRestTemplate;
 
 	public MainPageResponse createResponse(int randseed) {
-//		Random random = new Random(randseed);
-//		List<Bird> birds = aves.getBirds();
-//		Bird bird = birds.get(random.nextInt(birds.size()));
-
-
+		final MainPage.Builder mainPageBuilder = MainPage.builder();
 		logger.info("Getting random bird");
-		BirdResponse birdResponse = restTemplate.getForObject("http://info/randombird/", BirdResponse.class);
 
-		// TODO null and range checking goes here.
-		Bird bird = birdResponse.getBirds().get(0);
-		logger.info("Got {}", bird.getName());
+		getExchange("http://info/randombird/", BirdResponse.class, "").flatMap(
+				responseEntity -> {
+					// TODO null and range checking goes here.
+					Bird bird = responseEntity.getBody().getBirds().get(0);
+					mainPageBuilder.withBird(bird);
 
-		logger.info("Getting image");
-		ImageResponse imageResponse = restTemplate.getForObject("http://image/image/{id}", ImageResponse.class, bird.getName());
+					logger.info("Got {}", bird.getName());
+					Observable<ResponseEntity<ImageResponse>> imageObs = getImageObservable(mainPageBuilder, bird);
+					Observable<ResponseEntity<BirdResponse>> alternativesObs = getAlternativesObservable(mainPageBuilder, bird);
 
-		// TODO null and range checking goes here.
-		final Image image;
-		if (imageResponse.getImages().isEmpty()) {
-			image = null;
-		} else {
-			image = imageResponse.getImages().get(0);
-			logger.info("Got image {}", image.getUrl());
-		}
-
-		FamilyResponse familyResponse = restTemplate.getForObject("http://info/family/{id}",
-				FamilyResponse.class,
-				bird.getFamily());
-
-		logger.info("Got alternatives for family {}", familyResponse.getFamilies().stream().map(Family::getName).collect(Collectors.joining(",")));
-
-		logger.info("Number of birds in family {}: {}",
-				familyResponse.getFamilies().get(0).getName(),
-				familyResponse.getFamilies().get(0).getBirdNames().size());
-
-		logger.info("Bird names {}",familyResponse.getFamilies().get(0).getBirdNames().stream().collect(Collectors.joining(",")));
-
-		final String birdIds = familyResponse.getFamilies().stream()
-				.flatMap(f -> f.getBirdNames().stream())
-				.limit(5)
-				.collect(Collectors.joining(","));
-
-		logger.info("Getting info for alternatives {}", birdIds);
-
-		BirdResponse alternativeBirds = restTemplate.getForObject("http://info/bird/{names}", BirdResponse.class, birdIds);
-
-		final MainPage mainPage = MainPage.builder()
-				.withBird(bird)
-				.withAlternatives(alternativeBirds.getBirds())
-				.withBinary(image)
-				.build();
+					return Observable.merge(imageObs, alternativesObs);
+				}
+		).toBlocking().forEach((o) -> logger.info(o.toString()));
 
 		return MainPageResponse.builder()
-				.withMainPages(Collections.singletonList(mainPage))
+				.withMainPages(Collections.singletonList(mainPageBuilder.build()))
 				.build();
+	}
+
+	private Observable<ResponseEntity<BirdResponse>> getAlternativesObservable(MainPage.Builder mainPageBuilder, Bird bird) {
+		return getExchange("http://info/family/{id}",
+				FamilyResponse.class,
+				bird.getFamily()).flatMap(
+				familyResponseEntity -> {
+					return getExchange("http://info/bird/{names}", BirdResponse.class, familyResponseEntity.getBody()
+							.getFamilies()
+							.stream()
+							.flatMap(f -> f.getBirdNames().stream())
+							.limit(5)
+							.collect(Collectors.joining(","))).doOnNext(
+							alternativesResponseEntity -> {
+								logger.info("Getting alternative birds");
+								mainPageBuilder.withAlternatives(alternativesResponseEntity.getBody().getBirds());
+							});
+				}
+		);
+	}
+
+	private Observable<ResponseEntity<ImageResponse>> getImageObservable(MainPage.Builder mainPageBuilder, Bird bird) {
+		return getExchange("http://image/image/{id}",
+								ImageResponse.class,
+								bird.getName()).doOnNext(
+								imageEntity -> {
+									logger.info("Getting image");
+									if (imageEntity.getBody().getImages() != null && imageEntity.getBody().getImages().size() > 0) {
+										mainPageBuilder.withBinary(imageEntity.getBody().getImages().get(0));
+									} else {
+										logger.warn("Image empty");
+									}
+								});
+	}
+
+	private <T> Observable<ResponseEntity<T>> getExchange(String url, Class<T> responseClass, String param) {
+		return Observable.from(asyncRibbonRestTemplate.exchange(url,
+				HttpMethod.GET,
+				HttpEntity.EMPTY,
+				responseClass,
+				param));
 	}
 }

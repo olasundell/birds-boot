@@ -17,9 +17,11 @@ public abstract class AbstractResponse<T extends Model> {
 				.collect(Collectors.toList());
 
 		HashMap<String, Link> map = new HashMap<>();
+
 		for (Link l: list) {
 			map.put(getLinkPrefix() + "." + l.getType(), l);
 		}
+
 		return map;
 	}
 

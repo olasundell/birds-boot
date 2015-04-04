@@ -9,19 +9,21 @@ import se.atrosys.birds.common.formatter.BirdNameFormatter;
 import se.atrosys.service.info.factory.BirdResponseFactory;
 import se.atrosys.service.common.response.BirdResponse;
 
+import java.util.concurrent.Callable;
+
 @RestController
 public class BirdResource {
 	@Autowired
 	private BirdResponseFactory birdResponseFactory;
 
 	@RequestMapping("/bird/{names}")
-	public BirdResponse bird(@PathVariable("names") String names) {
-		return birdResponseFactory.createResponse(new BirdNameFormatter().formatNames(names));
+	public Callable<BirdResponse> bird(@PathVariable("names") String names) {
+		return () -> birdResponseFactory.createResponse(new BirdNameFormatter().formatNames(names)).toBlocking().single();
 	}
 
 	@RequestMapping("/randombird/")
-	public BirdResponse randombird(@RequestParam(value = "randseed", required = false, defaultValue = "0") int randseed) {
-		return birdResponseFactory.createResponseForRandomBird(randseed);
+	public Callable<BirdResponse> randombird(@RequestParam(value = "randseed", required = false, defaultValue = "0") int randseed) {
+		return () -> birdResponseFactory.createResponseForRandomBird(randseed).toBlocking().single();
 	}
 
 //	@RequestMapping("/allbirds")

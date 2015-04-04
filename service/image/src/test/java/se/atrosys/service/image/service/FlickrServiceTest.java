@@ -3,6 +3,7 @@ package se.atrosys.service.image.service;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import rx.Observable;
 import se.atrosys.birds.common.model.Image;
 
 import java.util.List;
@@ -14,14 +15,15 @@ public class FlickrServiceTest {
 	@Test
 	@Ignore
 	public void shouldGetDTO() {
-		List<Image> images = new FlickrService().getImages(ID);
+		final Observable<List<Image>> observable = new FlickrService().getImages(ID);
+		observable.doOnNext(images -> {
 
-		Image image = images.get(0);
+			Image image = images.get(0);
 
-		Assert.assertNotNull(image);
-		Assert.assertEquals(ID, image.getBirdId());
-		Assert.assertNotEquals("", image.getBirdId());
-		Assert.assertNotEquals("", image.getUrl());
+			Assert.assertNotNull(image);
+			Assert.assertEquals(ID, image.getBirdId());
+			Assert.assertNotEquals("", image.getBirdId());
+			Assert.assertNotEquals("", image.getUrl());
+		});
 	}
-
 }
