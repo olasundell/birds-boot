@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import rx.Observable;
 import se.atrosys.birds.common.model.Model;
 import se.atrosys.birds.common.model.Sound;
 import se.atrosys.service.common.Cache;
@@ -22,9 +23,8 @@ public class SoundResponseFactory {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private static final String UNLESS_SPEL = "#result == null";
 
-//	@Cacheable(value = CacheConstants.SOUND_CACHE, unless = UNLESS_SPEL)
 	@Cacheable(value = Cache.Constant.SOUND_CACHE_NAME)
-	public SoundResponse createResponse(List<String> ids, int limit) {
+	public Observable<SoundResponse> createResponse(List<String> ids, int limit) {
 		logger.info("Creating response for {}", ids);
 		RestTemplate template = new RestTemplate();
 		SoundResponse soundResponse = new SoundResponse();
@@ -37,7 +37,7 @@ public class SoundResponseFactory {
 			soundResponse.addModels(createModels(dto, limit));
 		}
 
-		return soundResponse;
+		return Observable.just(soundResponse);
 	}
 
 	private Collection<Sound> createModels(XenoCantoDTO dto, int limit) {

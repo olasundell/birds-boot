@@ -9,6 +9,8 @@ import se.atrosys.birds.common.formatter.BirdNameFormatter;
 import se.atrosys.service.sound.factory.SoundResponseFactory;
 import se.atrosys.service.common.response.SoundResponse;
 
+import java.util.concurrent.Callable;
+
 @RestController
 public class SoundResource {
 	@Autowired
@@ -17,7 +19,7 @@ public class SoundResource {
 	BirdNameFormatter birdNameFormatter;
 
 	@RequestMapping("/sound/{ids}")
-	public SoundResponse sound(@PathVariable("ids") String ids, @RequestParam(value = "limit", required = false) int limit) {
-		return soundResponseFactory.createResponse(birdNameFormatter.formatNames(ids), limit);
+	public Callable<SoundResponse> sound(@PathVariable("ids") String ids, @RequestParam(value = "limit", required = false) int limit) {
+		return () -> soundResponseFactory.createResponse(birdNameFormatter.formatNames(ids), limit).toBlocking().single();
 	}
 }

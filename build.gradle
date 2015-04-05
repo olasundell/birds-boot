@@ -1,12 +1,3 @@
-/*buildscript {
-
-	repositories {
-		maven { url "https://github.com/layerhq/releases-gradle/raw/master/releases" }
-	}
-	dependencies {
-		classpath group: 'com.layer', name: 'git-repo-plugin', version: '1.0.0'
-	}
-}*/
 buildscript {
 	repositories {
 		maven { url "http://repo.spring.io/libs-snapshot" }
@@ -18,7 +9,6 @@ buildscript {
 }
 
 allprojects {
-//	apply plugin: 'git-repo'
 	apply plugin: 'java'
 	apply plugin: 'idea'
 	apply plugin: 'maven-publish'
@@ -28,8 +18,6 @@ allprojects {
 
 	repositories {
 		mavenCentral()
-//		github("olasundell", "maven-repo", "master", "releases")
-//		github("olasundell", "maven-repo")
 	}
 
 	dependencies {
@@ -47,17 +35,6 @@ allprojects {
 	jar {
 		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	}
-
-//	zip {
-//		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//	}
-
-//	task buildDist(type: Zip) {
-//		into 'jars'
-//		from { subprojects.configurations.runtime }
-//		from { subprojects.jar }
-//		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//	}
 
 	publishing {
 		publications {
