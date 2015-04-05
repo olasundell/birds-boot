@@ -1,5 +1,7 @@
+apply plugin: 'spring-boot'
+
+bootRepackage.enabled = false
+
 dependencies {
 	compile project(":service/common")
-//	compile group: 'org.springframework', name: 'spring-security', version: ''
-//	compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth', version: '2.0.3.RELEASE'
 }

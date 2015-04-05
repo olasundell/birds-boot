@@ -9,7 +9,7 @@ version = '0.1'
 //}
 
 dependencies {
-	compile("org.springframework.boot:spring-boot-starter-web:1.2.2.RELEASE")
+	compile("org.springframework.boot:spring-boot-starter-web:1.2.3.RELEASE")
 //	testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 //

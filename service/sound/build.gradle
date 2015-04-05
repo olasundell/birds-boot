@@ -1,3 +1,7 @@
+apply plugin: 'spring-boot'
+
+bootRepackage.enabled = false
+
 dependencies {
 	compile project(":service/common")
 }
