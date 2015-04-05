@@ -4,7 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 import se.atrosys.birds.common.model.Model;
@@ -23,19 +28,26 @@ public class SoundResponseFactory {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private static final String UNLESS_SPEL = "#result == null";
 
+	AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+
 	@Cacheable(value = Cache.Constant.SOUND_CACHE_NAME)
 	public Observable<SoundResponse> createResponse(List<String> ids, int limit) {
 		logger.info("Creating response for {}", ids);
-		RestTemplate template = new RestTemplate();
+
 		SoundResponse soundResponse = new SoundResponse();
 
-		for (String id: ids) {
-			XenoCantoDTO dto = template.getForObject("http://www.xeno-canto.org/api/2/recordings?query={birdName}",
-					XenoCantoDTO.class, id);
+		ids.parallelStream().forEach(id -> {
+			ListenableFuture<ResponseEntity<XenoCantoDTO>> dtoFuture = asyncRestTemplate.exchange("http://www.xeno-canto.org/api/2/recordings?query={birdName}",
+					HttpMethod.GET,
+					HttpEntity.EMPTY,
+					XenoCantoDTO.class,
+					id);
 
-
-			soundResponse.addModels(createModels(dto, limit));
-		}
+			Observable.from(dtoFuture).doOnNext(
+					xenoCantoDTOResponseEntity ->
+							soundResponse.addModels(createModels(xenoCantoDTOResponseEntity.getBody(), limit))
+			);
+		});
 
 		return Observable.just(soundResponse);
 	}
@@ -45,7 +57,7 @@ public class SoundResponseFactory {
 			return new ArrayList<>();
 		}
 
-		return dto.recordings.stream()
+		return dto.recordings.parallelStream()
 				.limit(rangeCheckedLimit(limit))
 				.map(this::createModel)
 				.collect(Collectors.toList());
