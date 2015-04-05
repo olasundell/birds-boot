@@ -1,7 +1,9 @@
 package se.atrosys.birds.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize(builder=Sound.Builder.class)
 public class Sound extends AbstractBinary {
 	private String fileUrl;
 	private String location;

@@ -13,9 +13,11 @@ import se.atrosys.birds.common.model.Bird;
 import se.atrosys.service.common.response.BirdResponse;
 import se.atrosys.service.common.response.FamilyResponse;
 import se.atrosys.service.common.response.ImageResponse;
+import se.atrosys.service.common.response.SoundResponse;
 import se.atrosys.service.mainpage.model.MainPage;
 import se.atrosys.service.mainpage.response.MainPageResponse;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -26,11 +28,30 @@ public class MainPageResponseFactory {
 	@Autowired
 	private AsyncRestTemplate asyncRibbonRestTemplate;
 
-	public MainPageResponse createResponse(int randseed) {
+	public MainPageResponse createRandomResponse(int randseed) {
 		final MainPage.Builder mainPageBuilder = MainPage.builder();
 		logger.info("Getting random bird");
 
-		getExchange("http://info/randombird/", BirdResponse.class, "").flatMap(
+		createMainPage(mainPageBuilder, getExchange("http://info/randombird/", BirdResponse.class, "").cache());
+
+		return MainPageResponse.builder()
+				.withMainPages(Collections.singletonList(mainPageBuilder.build()))
+				.build();
+	}
+
+	public MainPageResponse createResponseForSpecificId(String birdId) {
+		final MainPage.Builder mainPageBuilder = MainPage.builder();
+		logger.info("Getting specific bird {}", birdId);
+
+		createMainPage(mainPageBuilder, getExchange("http://info/bird/{birdId}", BirdResponse.class, birdId).cache());
+
+		return MainPageResponse.builder()
+				.withMainPages(Collections.singletonList(mainPageBuilder.build()))
+				.build();
+	}
+
+	private void createMainPage(MainPage.Builder mainPageBuilder, Observable<ResponseEntity<BirdResponse>> responseEntityObservable) {
+		responseEntityObservable.flatMap(
 				responseEntity -> {
 					// TODO null and range checking goes here.
 					Bird bird = responseEntity.getBody().getBirds().get(0);
@@ -38,15 +59,32 @@ public class MainPageResponseFactory {
 
 					logger.info("Got {}", bird.getName());
 					Observable<ResponseEntity<ImageResponse>> imageObs = getImageObservable(mainPageBuilder, bird);
+					logger.info("First");
 					Observable<ResponseEntity<BirdResponse>> alternativesObs = getAlternativesObservable(mainPageBuilder, bird);
+					logger.info("Second");
+					Observable<ResponseEntity<SoundResponse>> soundObs = getSoundObservable(mainPageBuilder, bird);
+					logger.info("Third");
 
-					return Observable.merge(imageObs, alternativesObs);
+					return Observable.merge(Arrays.asList(alternativesObs, imageObs, soundObs), 3);
 				}
-		).toBlocking().forEach((o) -> logger.info(o.toString()));
+		).doOnError(
+				(t) -> logger.error("Something went awry", t)
+		).toBlocking().last();
+//		).forEach((o) -> logger.info("Got {}", o));
+	}
 
-		return MainPageResponse.builder()
-				.withMainPages(Collections.singletonList(mainPageBuilder.build()))
-				.build();
+	private Observable<ResponseEntity<SoundResponse>> getSoundObservable(MainPage.Builder mainPageBuilder, Bird bird) {
+		return getExchange("http://sound/sound/{id}",
+				SoundResponse.class,
+				bird.getName()).doOnNext(
+				soundEntity -> {
+					if (soundEntity.getBody().getSounds() != null && soundEntity.getBody().getSounds().size() > 0) {
+						mainPageBuilder.withSound(soundEntity.getBody().getSounds().get(0));
+						logger.info("Got sound");
+					} else {
+						logger.warn("Sound empty");
+					}
+				});
 	}
 
 	private Observable<ResponseEntity<BirdResponse>> getAlternativesObservable(MainPage.Builder mainPageBuilder, Bird bird) {
@@ -61,8 +99,8 @@ public class MainPageResponseFactory {
 							.limit(5)
 							.collect(Collectors.joining(","))).doOnNext(
 							alternativesResponseEntity -> {
-								logger.info("Getting alternative birds");
 								mainPageBuilder.withAlternatives(alternativesResponseEntity.getBody().getBirds());
+								logger.info("Got alternative birds");
 							});
 				}
 		);
@@ -72,14 +110,14 @@ public class MainPageResponseFactory {
 		return getExchange("http://image/image/{id}",
 								ImageResponse.class,
 								bird.getName()).doOnNext(
-								imageEntity -> {
-									logger.info("Getting image");
-									if (imageEntity.getBody().getImages() != null && imageEntity.getBody().getImages().size() > 0) {
-										mainPageBuilder.withBinary(imageEntity.getBody().getImages().get(0));
-									} else {
-										logger.warn("Image empty");
-									}
-								});
+				imageEntity -> {
+					if (imageEntity.getBody().getImages() != null && imageEntity.getBody().getImages().size() > 0) {
+						mainPageBuilder.withImage(imageEntity.getBody().getImages().get(0));
+						logger.info("Got image");
+					} else {
+						logger.warn("Image empty");
+					}
+				});
 	}
 
 	private <T> Observable<ResponseEntity<T>> getExchange(String url, Class<T> responseClass, String param) {

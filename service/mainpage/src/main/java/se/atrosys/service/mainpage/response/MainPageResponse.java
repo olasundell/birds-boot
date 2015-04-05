@@ -1,5 +1,6 @@
 package se.atrosys.service.mainpage.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
 import se.atrosys.birds.common.model.AbstractBinary;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 @JsonDeserialize(builder = MainPageResponse.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MainPageResponse extends AbstractResponse<MainPage> {
 	private MainPageResponse(Builder builder) {
 		this.models.addAll(builder.mainPages);

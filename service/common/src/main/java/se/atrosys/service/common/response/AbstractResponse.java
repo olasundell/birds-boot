@@ -1,11 +1,13 @@
 package se.atrosys.service.common.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import se.atrosys.birds.common.model.Model;
 import se.atrosys.service.common.service.ServiceProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractResponse<T extends Model> {
 	protected final List<T> models = new ArrayList<>();
 

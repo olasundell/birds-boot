@@ -19,7 +19,8 @@ public class SoundResource {
 	BirdNameFormatter birdNameFormatter;
 
 	@RequestMapping("/sound/{ids}")
-	public Callable<SoundResponse> sound(@PathVariable("ids") String ids, @RequestParam(value = "limit", required = false) int limit) {
+	public Callable<SoundResponse> sound(@PathVariable("ids") String ids,
+	                                     @RequestParam(value = "limit", required = false, defaultValue = "3") Integer limit) {
 		return () -> soundResponseFactory.createResponse(birdNameFormatter.formatNames(ids), limit).toBlocking().single();
 	}
 }

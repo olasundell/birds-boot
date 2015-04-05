@@ -1,9 +1,7 @@
 package se.atrosys.service.mainpage.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import se.atrosys.birds.common.model.AbstractBinary;
-import se.atrosys.birds.common.model.Bird;
-import se.atrosys.birds.common.model.Model;
+import se.atrosys.birds.common.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +10,24 @@ import java.util.List;
 public class MainPage implements Model {
 	private final Bird bird;
 	private final List<Bird> alternatives;
-	private final AbstractBinary binary;
+	private final Image image;
+	private final Sound sound;
 
 	private MainPage(Builder builder) {
 		this.bird = builder.bird;
 		this.alternatives = builder.alternatives;
-		this.binary = builder.binary;
+		this.sound = builder.sound;
+		this.image = builder.image;
 	}
+
+	public Image getImage() {
+		return image;
+	}
+
+	public Sound getSound() {
+		return sound;
+	}
+
 
 	public Bird getBird() {
 		return bird;
@@ -28,10 +37,6 @@ public class MainPage implements Model {
 		return alternatives;
 	}
 
-	public AbstractBinary getBinary() {
-		return binary;
-	}
-
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -39,7 +44,8 @@ public class MainPage implements Model {
 	public static class Builder {
 		private Bird bird;
 		private final List<Bird> alternatives = new ArrayList<>();
-		private AbstractBinary binary;
+		private Image image;
+		private Sound sound;
 
 		private Builder() {}
 
@@ -54,8 +60,13 @@ public class MainPage implements Model {
 			return this;
 		}
 
-		public Builder withBinary(AbstractBinary binary) {
-			this.binary = binary;
+		public Builder withSound(Sound sound) {
+			this.sound = sound;
+			return this;
+		}
+
+		public Builder withImage(Image image) {
+			this.image = image;
 			return this;
 		}
 

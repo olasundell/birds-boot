@@ -34,7 +34,9 @@ public class SoundResponseFactory {
 	public Observable<SoundResponse> createResponse(List<String> ids, int limit) {
 		logger.info("Creating response for {}", ids);
 
-		SoundResponse soundResponse = new SoundResponse();
+		SoundResponse.Builder builder = SoundResponse.builder();
+
+		List<Observable<ResponseEntity<XenoCantoDTO>>> list = new ArrayList<>();
 
 		ids.parallelStream().forEach(id -> {
 			ListenableFuture<ResponseEntity<XenoCantoDTO>> dtoFuture = asyncRestTemplate.exchange("http://www.xeno-canto.org/api/2/recordings?query={birdName}",
@@ -43,13 +45,15 @@ public class SoundResponseFactory {
 					XenoCantoDTO.class,
 					id);
 
-			Observable.from(dtoFuture).doOnNext(
+			list.add(Observable.from(dtoFuture).doOnNext(
 					xenoCantoDTOResponseEntity ->
-							soundResponse.addModels(createModels(xenoCantoDTOResponseEntity.getBody(), limit))
-			);
+							builder.withSounds(createModels(xenoCantoDTOResponseEntity.getBody(), limit))
+			));
 		});
 
-		return Observable.just(soundResponse);
+		Observable.merge(list).toBlocking().last();
+
+		return Observable.just(builder.build());
 	}
 
 	private Collection<Sound> createModels(XenoCantoDTO dto, int limit) {
