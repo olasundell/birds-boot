@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
+import rx.schedulers.Schedulers;
 import se.atrosys.birds.common.model.Bird;
 import se.atrosys.service.common.response.BirdResponse;
 import se.atrosys.service.common.response.FamilyResponse;
@@ -29,21 +30,24 @@ public class MainPageResponseFactory {
 	private AsyncRestTemplate asyncRibbonRestTemplate;
 
 	public MainPageResponse createRandomResponse(int randseed) {
-		final MainPage.Builder mainPageBuilder = MainPage.builder();
-		logger.info("Getting random bird");
-
-		createMainPage(mainPageBuilder, getExchange("http://info/randombird/", BirdResponse.class, "").cache());
-
-		return MainPageResponse.builder()
-				.withMainPages(Collections.singletonList(mainPageBuilder.build()))
-				.build();
+		return createResponse("http://info/randombird/", "");
 	}
 
 	public MainPageResponse createResponseForSpecificId(String birdId) {
-		final MainPage.Builder mainPageBuilder = MainPage.builder();
-		logger.info("Getting specific bird {}", birdId);
+		return createResponse("http://info/bird/{birdId}", birdId);
+	}
 
-		createMainPage(mainPageBuilder, getExchange("http://info/bird/{birdId}", BirdResponse.class, birdId).cache());
+
+	private MainPageResponse createResponse(String url, String birdId) {
+		final MainPage.Builder mainPageBuilder = MainPage.builder();
+		if (birdId == null || birdId.isEmpty()) {
+			logger.info("Getting random bird");
+		} else {
+			logger.info("Getting bird {}", birdId);
+		}
+
+		createMainPage(mainPageBuilder, getExchange(url, BirdResponse.class, birdId));
+
 
 		return MainPageResponse.builder()
 				.withMainPages(Collections.singletonList(mainPageBuilder.build()))
@@ -58,14 +62,14 @@ public class MainPageResponseFactory {
 					mainPageBuilder.withBird(bird);
 
 					logger.info("Got {}", bird.getName());
-					Observable<ResponseEntity<ImageResponse>> imageObs = getImageObservable(mainPageBuilder, bird);
+					Observable<ResponseEntity<ImageResponse>> imageObs = getImageObservable(mainPageBuilder, bird).subscribeOn(Schedulers.io());
 					logger.info("First");
-					Observable<ResponseEntity<BirdResponse>> alternativesObs = getAlternativesObservable(mainPageBuilder, bird);
+					Observable<ResponseEntity<BirdResponse>> alternativesObs = getAlternativesObservable(mainPageBuilder, bird).subscribeOn(Schedulers.io());
 					logger.info("Second");
-					Observable<ResponseEntity<SoundResponse>> soundObs = getSoundObservable(mainPageBuilder, bird);
+					Observable<ResponseEntity<SoundResponse>> soundObs = getSoundObservable(mainPageBuilder, bird).subscribeOn(Schedulers.io());
 					logger.info("Third");
 
-					return Observable.merge(Arrays.asList(alternativesObs, imageObs, soundObs), 3);
+					return Observable.merge(Arrays.asList(soundObs, imageObs, alternativesObs));
 				}
 		).doOnError(
 				(t) -> logger.error("Something went awry", t)
